@@ -1,7 +1,23 @@
-import React, {Component} from 'react';
+import React from 'react';
+import {createStackNavigator} from '@react-navigation/stack';
+import Main from './Components/BottomNavigation';
+import Profile from '../Screens/Profile/Profile';
+import ChatList from '../Screens/Chat/ChatList';
+import ChatNavigation from './Components/ChatNavigation';
+import ChatID from '../Screens/Chat/ChatID';
 
-export default class PublicNavigation extends Component {
-  render() {
-    return <></>;
-  }
+function PrivateNavigation(props) {
+  const Stack = createStackNavigator();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Stack.Screen name="ChatNavigation" component={ChatNavigation} />
+      <Stack.Screen name="ChatList" component={ChatList} />
+      <Stack.Screen name="ChatID" component={ChatID} />
+    </Stack.Navigator>
+  );
 }
+
+export default PrivateNavigation;

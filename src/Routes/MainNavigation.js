@@ -3,11 +3,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import PrivateNavigation from './PrivateNavigation';
 import PublicNavigation from './PublicNavgation';
+import SplashScreen from 'react-native-splash-screen';
 
 function MainRoutes(props) {
   const [isLogin, setIsLogin] = React.useState(true);
 
-  if (!isLogin) {
+  if (isLogin) {
     return <PrivateNavigation />;
   } else {
     return <PublicNavigation />;
@@ -16,6 +17,9 @@ function MainRoutes(props) {
 
 function MainNavigation(props) {
   const Stack = createStackNavigator();
+  React.useEffect(() => {
+    SplashScreen.hide();
+  });
   return (
     <NavigationContainer>
       <Stack.Navigator

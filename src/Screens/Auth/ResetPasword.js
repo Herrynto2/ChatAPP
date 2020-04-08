@@ -10,10 +10,42 @@ import {Image, Input, Button, Icon} from 'react-native-elements';
 import Reset from '../../Helper/Image/reset.jpg';
 import OverlayImg from '../../Components/OverlaySuccess';
 import Icons from 'react-native-vector-icons/FontAwesome5';
+import CustomAlert from '../../Components/CustomAlert';
+import CustomInputText from '../../Components/CustomInputText';
+import * as Yup from 'yup';
+import Loader from '../../Components/Loader';
+import {useFormik} from 'formik';
 
 function ResetPassword(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
   const [isVisible, setHideVisible] = React.useState(false);
+
+  const FormResetPass = useFormik({
+    initialValues: {
+      verification_code: '',
+      new_password: '',
+      confirm_password: '',
+    },
+    validationSchema: Yup.object({
+      verification_code: Yup.string()
+        .required('verification code is Required')
+        .min(6, 'verification code Must have min 6 character'),
+      new_password: Yup.string()
+        .required('password is Required')
+        .min(8, 'password Must have min 8 character'),
+      confirm_password: Yup.string()
+        .oneOf([Yup.ref('new_password')], 'Confirm Password Not Match')
+        .required('Confirm Password Is Required'),
+    }),
+    onSubmit: async (values, form) => {
+      setLoading(true);
+      try {
+        CustomAlert(true, 'Login success');
+        console.log('message');
+      } catch (err) {}
+      setLoading(false);
+    },
+  });
 
   return (
     <>
@@ -48,17 +80,26 @@ function ResetPassword(props) {
               </Text>
             </View>
             <View style={style.input}>
-              <Input
+              <CustomInputText
+                form={FormResetPass}
+                name="verification_code"
+                keyboardType="numeric"
                 placeholder="verification code"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
-                leftIcon={<Icons name="phone" size={16} color="#b8b8b8" />}
+                leftIcon={<Icons name="user-check" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  <Icons name="check-circle" size={15} color="#b8b8b8" />
+                  FormResetPass.errors.verification_code ? (
+                    <Icons size={15} color={'grey'} />
+                  ) : (
+                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
+                  )
                 }
               />
-              <Input
+              <CustomInputText
+                form={FormResetPass}
+                name="new_password"
                 secureTextEntry={hidePassword ? true : false}
                 placeholder="new password"
                 containerStyle={style.inputContainer}
@@ -77,6 +118,8 @@ function ResetPassword(props) {
                 }
               />
               <Input
+                form={FormResetPass}
+                name="confirm_password"
                 secureTextEntry={hidePassword ? true : false}
                 placeholder="confirm password"
                 containerStyle={style.inputContainer}

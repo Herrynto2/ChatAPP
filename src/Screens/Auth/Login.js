@@ -9,13 +9,50 @@ import {
 import {Image, Input, Button, Icon} from 'react-native-elements';
 import Logins from '../../Helper/Image/login.jpg';
 import Icons from 'react-native-vector-icons/FontAwesome5';
+import CustomAlert from '../../Components/CustomAlert';
+import CustomInputText from '../../Components/CustomInputText';
+import * as Yup from 'yup';
+import Loader from '../../Components/Loader';
+import {useFormik} from 'formik';
 
 function Login(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
+  const [isFocus, setIsFocus] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
+
+  const FormLogin = useFormik({
+    initialValues: {username: '', password: ''},
+    validationSchema: Yup.object({
+      username: Yup.string()
+        .required('username is Required')
+        .min(6, 'username Must have min 6 character'),
+      password: Yup.string().required('Password is Required'),
+    }),
+    onSubmit: async (values, form) => {
+      setLoading(true);
+      try {
+        // const response = await dispatch(userLogin(values));
+        // if (response.data && !response.data.success) {
+        CustomAlert(true, 'Login success');
+        // }
+        console.log('message');
+      } catch (err) {
+        // setLoading(false);
+        // console.log('er', err);
+        // if (!(err.message === 'Network Error')) {
+        //   if (err.response) {
+        //     CustomAlert(err.response.data.success, err.response.data.msg);
+        //   }
+        // }
+      }
+      setLoading(false);
+    },
+  });
 
   return (
     <>
       <View style={style.container}>
+        {loading && <Loader loading={loading} setLoading={setLoading} />}
         <View style={{flex: 1, paddingBottom: 30}}>
           <TouchableOpacity
             style={{width: 50, marginTop: 25}}
@@ -32,17 +69,25 @@ function Login(props) {
               <Image source={Logins} style={style.images} />
             </View>
             <View style={style.input}>
-              <Input
+              <CustomInputText
+                form={FormLogin}
+                name="username"
                 placeholder="username"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
                 leftIcon={<Icons name="user" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  <Icons name="check-circle" size={15} color="#b8b8b8" />
+                  FormLogin.errors.username ? (
+                    <Icons size={15} color={'grey'} />
+                  ) : (
+                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
+                  )
                 }
               />
-              <Input
+              <CustomInputText
+                form={FormLogin}
+                name="password"
                 secureTextEntry={hidePassword ? true : false}
                 placeholder="password"
                 containerStyle={style.inputContainer}
@@ -81,6 +126,7 @@ function Login(props) {
               <TouchableOpacity>
                 <Button
                   icon={<Icons name="google" size={16} color="white" />}
+                  onPress={FormLogin.handleSubmit}
                   buttonStyle={{
                     ...style.anotherLogin,
                     backgroundColor: '#df4c4f',
@@ -175,5 +221,11 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     textAlign: 'center',
     alignSelf: 'center',
+  },
+  font: {
+    fontSize: 20,
+  },
+  fonts: {
+    fontSize: 11,
   },
 });

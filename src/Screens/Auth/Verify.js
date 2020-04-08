@@ -6,12 +6,33 @@ import {
   Text,
   ScrollView,
 } from 'react-native';
-import {Image, Input, Button, Icon} from 'react-native-elements';
+import {Image, Input, Button} from 'react-native-elements';
 import VerifyImg from '../../Helper/Image/verify.jpg';
 import Icons from 'react-native-vector-icons/FontAwesome5';
+import CustomAlert from '../../Components/CustomAlert';
+import CustomInputText from '../../Components/CustomInputText';
+import * as Yup from 'yup';
+import Loader from '../../Components/Loader';
+import {useFormik} from 'formik';
 
 function Verify(props) {
-  const [hidePassword, setHidePassword] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
+
+  const FormVerify = useFormik({
+    initialValues: {
+      verification_code: '',
+    },
+    validationSchema: Yup.object({
+      verification_code: Yup.string()
+        .length(6, 'Code Verify Only Have 6 Character')
+        .required('Code Verify Is Required'),
+    }),
+    onSubmit: async (values, form) => {
+      setLoading(true);
+      props.navigation.navigate('Verify');
+      setLoading(false);
+    },
+  });
 
   return (
     <>
@@ -35,8 +56,10 @@ function Verify(props) {
               </Text>
             </View>
             <View>
-              <Input
-                name="code_verify"
+              <CustomInputText
+                keyboardType="numeric"
+                form={FormVerify}
+                name="verification_code"
                 inputContainerStyle={style.input}
                 inputStyle={style.inputText}
               />

@@ -7,15 +7,49 @@ import {
   ScrollView,
 } from 'react-native';
 import {Image, Input, Button, Icon} from 'react-native-elements';
-import Logins from '../../Helper/Image/login.jpg';
+import CustomAlert from '../../Components/CustomAlert';
+import CustomInputText from '../../Components/CustomInputText';
+import * as Yup from 'yup';
+import Loader from '../../Components/Loader';
+import {useFormik} from 'formik';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 
 function Register(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
+
+  const FormRegister = useFormik({
+    initialValues: {
+      username: '',
+      email: '',
+      password: '',
+      phone_number: '',
+    },
+    validationSchema: Yup.object({
+      username: Yup.string()
+        .min(6, 'Username Must have More Than 6 character')
+        .required('Username Is Required'),
+      password: Yup.string()
+        .min(8, 'Password Must have More Than 8 Character')
+        .required('Passoword Is Required'),
+      email: Yup.string()
+        .email('Enter Valid Valid Email')
+        .required('Email is Required'),
+      phone_number: Yup.number()
+        .required('Required phone number')
+        .min(10, 'Phone number Must have min 10 character'),
+    }),
+    onSubmit: async (values, form) => {
+      setLoading(true);
+      props.navigation.navigate('Verify');
+      setLoading(false);
+    },
+  });
 
   return (
     <>
       <View style={style.container}>
+        {loading && <Loader loading={loading} setLoading={setLoading} />}
         <View style={{flex: 1, paddingBottom: 20, marginBottom: 20}}>
           <TouchableOpacity
             style={{width: 50, marginTop: 25}}
@@ -28,19 +62,26 @@ function Register(props) {
         </View>
         <View style={style.content}>
           <ScrollView>
-            {/* <Image source={Logins} style={style.images} /> */}
             <View style={style.input}>
-              <Input
+              <CustomInputText
+                form={FormRegister}
+                name="username"
                 placeholder="username"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
                 leftIcon={<Icons name="user" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  <Icons name="check-circle" size={15} color="#b8b8b8" />
+                  FormRegister.errors.username ? (
+                    <Icons size={15} color={'grey'} />
+                  ) : (
+                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
+                  )
                 }
               />
-              <Input
+              <CustomInputText
+                form={FormRegister}
+                name="password"
                 secureTextEntry={hidePassword ? true : false}
                 placeholder="password"
                 containerStyle={style.inputContainer}
@@ -58,30 +99,44 @@ function Register(props) {
                   </TouchableOpacity>
                 }
               />
-              <Input
+              <CustomInputText
+                form={FormRegister}
+                name="phone_number"
+                keyboardType="numeric"
                 placeholder="phone number"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
                 leftIcon={<Icons name="phone" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  <Icons name="check-circle" size={15} color="#b8b8b8" />
+                  FormRegister.errors.phone_number ? (
+                    <Icons size={15} color={'grey'} />
+                  ) : (
+                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
+                  )
                 }
               />
-              <Input
+              <CustomInputText
                 placeholder="Email"
+                form={FormRegister}
+                name="email"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
                 leftIcon={<Icons name="envelope" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  <Icons name="check-circle" size={15} color="#b8b8b8" />
+                  FormRegister.errors.email ? (
+                    <Icons size={15} color={'grey'} />
+                  ) : (
+                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
+                  )
                 }
               />
               <View style={{alignItems: 'center'}}>
                 <Button
                   title="Sign Up"
                   buttonStyle={style.button}
+                  // onPress={() => FormRegister.handleSubmit()}
                   onPress={() => props.navigation.navigate('Verify')}
                 />
               </View>

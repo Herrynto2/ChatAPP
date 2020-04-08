@@ -11,16 +11,7 @@ function StartScreen(props) {
         <View style={style.content}>
           <Image source={Youme} style={style.images} />
           <View style={style.input}>
-            <View style={style.containerInfo}>
-              <Text
-                style={{color: '#2a2a2a', fontSize: 20, fontWeight: 'bold'}}>
-                Welcome
-              </Text>
-              <Text style={style.textInfo}>
-                App allows to take picture of your receipts and save the receipt
-                information
-              </Text>
-            </View>
+            <View style={style.containerInfo} />
             <View style={style.containerButton}>
               <Button
                 title="Login"
@@ -80,7 +71,7 @@ const style = StyleSheet.create({
     paddingTop: 100,
   },
   images: {
-    width: 205,
+    width: 220,
     height: 50,
     marginBottom: 90,
   },

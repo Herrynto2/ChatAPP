@@ -8,10 +8,42 @@ import {
 } from 'react-native';
 import {Image, Input, Button, Icon} from 'react-native-elements';
 import CheckImg from '../../Helper/Image/check.jpg';
+import CustomAlert from '../../Components/CustomAlert';
+import CustomInputText from '../../Components/CustomInputText';
+import * as Yup from 'yup';
+import Loader from '../../Components/Loader';
+import {useFormik} from 'formik';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 
 function CheckContact(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
+  const FormCheckPass = useFormik({
+    initialValues: {phone_number: ''},
+    validationSchema: Yup.object({
+      phone_number: Yup.string()
+        .required('phone number is Required')
+        .min(10, 'Phone number Must have min 10 character'),
+    }),
+    onSubmit: async (values, form) => {
+      setLoading(true);
+      try {
+        // const response = await dispatch(userLogin(values));
+        // if (response.data && !response.data.success) {
+        CustomAlert(true, 'Login success');
+        // }
+        console.log('message');
+      } catch (err) {
+        // setLoading(false);
+        // console.log('er', err);
+        // if (!(err.message === 'Network Error')) {
+        //   if (err.response) {
+        //     CustomAlert(err.response.data.success, err.response.data.msg);
+        //   }
+        // }
+      }
+      setLoading(false);
+    },
+  });
 
   return (
     <>
@@ -36,14 +68,21 @@ function CheckContact(props) {
               </Text>
             </View>
             <View style={style.input}>
-              <Input
+              <CustomInputText
+                form={FormCheckPass}
+                name="phone_number"
+                keyboardType="numeric"
                 placeholder="phone number"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
                 leftIcon={<Icons name="phone" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  <Icons name="check-circle" size={15} color="#b8b8b8" />
+                  FormCheckPass.errors.phone_number ? (
+                    <Icons size={15} color={'grey'} />
+                  ) : (
+                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
+                  )
                 }
               />
             </View>
