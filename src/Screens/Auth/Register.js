@@ -79,7 +79,11 @@ function Register(props) {
                 }
               />
               <View style={{alignItems: 'center'}}>
-                <Button title="Sign Up" buttonStyle={style.button} />
+                <Button
+                  title="Sign Up"
+                  buttonStyle={style.button}
+                  onPress={() => props.navigation.navigate('Verify')}
+                />
               </View>
             </View>
 

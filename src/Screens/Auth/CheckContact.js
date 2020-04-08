@@ -47,11 +47,12 @@ function CheckContact(props) {
                 }
               />
             </View>
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate('CheckContact')}
-            />
             <View style={{alignItems: 'center'}}>
-              <Button title="Check Now" buttonStyle={style.button} />
+              <Button
+                title="Check Now"
+                buttonStyle={style.button}
+                onPress={() => props.navigation.navigate('ResetPassword')}
+              />
             </View>
           </ScrollView>
         </View>

@@ -6,6 +6,7 @@ import CheckContact from '../Screens/Auth/CheckContact';
 import Verify from '../Screens/Auth/Verify';
 import ResetPassword from '../Screens/Auth/ResetPasword';
 import StartScreen from '../Screens/Auth/StartScreen';
+import Success from '../Screens/Auth/Success';
 
 function PublicNavigation(props) {
   const Stack = createStackNavigator();
@@ -20,6 +21,7 @@ function PublicNavigation(props) {
       <Stack.Screen name="CheckContact" component={CheckContact} />
       <Stack.Screen name="Verify" component={Verify} />
       <Stack.Screen name="ResetPassword" component={ResetPassword} />
+      <Stack.Screen name="Success" component={Success} />
     </Stack.Navigator>
   );
 }

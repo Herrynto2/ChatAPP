@@ -125,8 +125,8 @@ const style = StyleSheet.create({
     flex: 10,
   },
   images: {
-    width: 220,
-    height: 220,
+    width: 200,
+    height: 200,
   },
   input: {
     marginTop: 25,

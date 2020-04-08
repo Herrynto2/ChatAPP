@@ -7,10 +7,10 @@ import {
   ScrollView,
 } from 'react-native';
 import {Image, Input, Button, Icon} from 'react-native-elements';
-import VerifyImg from '../../Helper/Image/verify.jpg';
+import SuccessImg from '../../Helper/Image/success.jpg';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 
-function Verify(props) {
+function Success(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
 
   return (
@@ -23,29 +23,22 @@ function Verify(props) {
             <Icons name="chevron-left" size={20} style={style.backIcon} />
           </TouchableOpacity>
           <View style={{alignItems: 'center'}}>
-            <Text style={style.title}>Verify</Text>
+            <Text style={style.title}>Success</Text>
           </View>
         </View>
         <View style={style.content}>
           <ScrollView>
             <View style={{alignItems: 'center', paddingHorizontal: 40}}>
-              <Image source={VerifyImg} style={style.images} />
+              <Image source={SuccessImg} style={style.images} />
               <Text style={style.textSignup}>
-                Your verification code already send to +622184783116
+                You have successfully verified, please click to complete login
               </Text>
-            </View>
-            <View>
-              <Input
-                name="code_verify"
-                inputContainerStyle={style.input}
-                inputStyle={style.inputText}
-              />
             </View>
             <View style={{alignItems: 'center'}}>
               <Button
-                title="Verify"
+                title="Continue"
                 buttonStyle={style.button}
-                onPress={() => props.navigation.navigate('Success')}
+                onPress={() => props.navigation.navigate('Login')}
               />
             </View>
           </ScrollView>
@@ -54,7 +47,7 @@ function Verify(props) {
     </>
   );
 }
-export default Verify;
+export default Success;
 
 const style = StyleSheet.create({
   container: {
@@ -70,20 +63,13 @@ const style = StyleSheet.create({
   },
   content: {
     marginTop: 20,
-    flex: 10,
+    flex: 4,
   },
   images: {
     width: 170,
     height: 170,
   },
-  inputContainer: {
-    width: 280,
-  },
-  textInput: {
-    fontSize: 14,
-    marginLeft: 20,
-    color: '#707070',
-  },
+
   button: {
     backgroundColor: '#1d57b6',
     width: 160,
@@ -119,19 +105,5 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     textAlign: 'center',
     alignSelf: 'center',
-  },
-  input: {
-    marginTop: 30,
-    borderRadius: 25,
-    borderBottomWidth: 0,
-    backgroundColor: '#f0efef',
-    width: 250,
-    height: 60,
-    alignSelf: 'center',
-  },
-  inputText: {
-    fontSize: 25,
-    textAlign: 'center',
-    color: '#525252',
   },
 });
