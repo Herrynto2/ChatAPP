@@ -15,22 +15,12 @@ function Contact(props) {
           marginTop: -20,
         }}>
         <View style={{flex: 1, paddingHorizontal: 30, marginBottom: 50}}>
-          <Text>Hello</Text>
           <SearchBar
             placeholder="Type Here..."
             // onChangeText={this.updateSearch}
             // value={search}
-            containerStyle={{
-              backgroundColor: 'transparent',
-              borderBottomWidth: 0,
-              borderWidth: 0,
-            }}
-            inputContainerStyle={{
-              backgroundColor: 'white',
-              borderRadius: 20,
-              marginTop: 7,
-              height: 50,
-            }}
+            containerStyle={style.seacrhContainer}
+            inputContainerStyle={style.seacrhInput}
             inputStyle={{fontSize: 14}}
           />
           <Text
@@ -99,5 +89,16 @@ const style = StyleSheet.create({
   status: {
     fontSize: 12,
     color: '#bababa',
+  },
+  seacrhContainer: {
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
+    borderWidth: 0,
+  },
+  seacrhInput: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    marginTop: 25,
+    height: 50,
   },
 });
