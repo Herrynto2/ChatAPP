@@ -13,6 +13,7 @@ import * as Yup from 'yup';
 import Loader from '../../Components/Loader';
 import {useFormik} from 'formik';
 import Icons from 'react-native-vector-icons/FontAwesome5';
+import {auth} from '../../Config/Firebase';
 
 function Register(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
@@ -20,28 +21,38 @@ function Register(props) {
 
   const FormRegister = useFormik({
     initialValues: {
-      username: '',
       email: '',
       password: '',
-      phone_number: '',
+      confirm_password: '',
     },
     validationSchema: Yup.object({
-      username: Yup.string()
-        .min(6, 'Username Must have More Than 6 character')
-        .required('Username Is Required'),
-      password: Yup.string()
-        .min(8, 'Password Must have More Than 8 Character')
-        .required('Passoword Is Required'),
       email: Yup.string()
         .email('Enter Valid Valid Email')
         .required('Email is Required'),
-      phone_number: Yup.number()
-        .required('Required phone number')
-        .min(10, 'Phone number Must have min 10 character'),
+      password: Yup.string()
+        .min(8, 'Password Must have More Than 8 Character')
+        .required('Passoword Is Required'),
+      confirm_password: Yup.string()
+        .oneOf([Yup.ref('password')], 'Password Not Match')
+        .required('Confirm Password is Required'),
     }),
     onSubmit: async (values, form) => {
       setLoading(true);
-      props.navigation.navigate('Verify');
+      try {
+        await auth
+          .createUserWithEmailAndPassword(values.email, values.password)
+          .then(u => {
+            CustomAlert(true, 'register success');
+            form.setSubmitting(false);
+            form.resetForm();
+            props.navigation.navigate('Login');
+          })
+          .catch(err => {
+            CustomAlert(false, err.message);
+          });
+      } catch (err) {
+        CustomAlert(false, err.message);
+      }
       setLoading(false);
     },
   });
@@ -64,15 +75,15 @@ function Register(props) {
           <ScrollView>
             <View style={style.input}>
               <CustomInputText
+                placeholder="Email"
                 form={FormRegister}
-                name="username"
-                placeholder="username"
+                name="email"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
-                leftIcon={<Icons name="user" size={16} color="#b8b8b8" />}
+                leftIcon={<Icons name="envelope" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  FormRegister.errors.username ? (
+                  FormRegister.errors.email ? (
                     <Icons size={15} color={'grey'} />
                   ) : (
                     <Icons name="check-circle" size={15} color={'#1d57b6'} />
@@ -101,43 +112,30 @@ function Register(props) {
               />
               <CustomInputText
                 form={FormRegister}
-                name="phone_number"
-                keyboardType="numeric"
-                placeholder="phone number"
+                name="confirm_password"
+                secureTextEntry={hidePassword ? true : false}
+                placeholder="confirm_password"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
-                leftIcon={<Icons name="phone" size={16} color="#b8b8b8" />}
+                leftIcon={<Icons name="unlock-alt" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  FormRegister.errors.phone_number ? (
-                    <Icons size={15} color={'grey'} />
-                  ) : (
-                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
-                  )
+                  <TouchableOpacity
+                    onPress={() => setHidePassword(!hidePassword)}>
+                    <Icons
+                      name={hidePassword ? 'eye-slash' : 'eye'}
+                      size={15}
+                      color="#b8b8b8"
+                    />
+                  </TouchableOpacity>
                 }
               />
-              <CustomInputText
-                placeholder="Email"
-                form={FormRegister}
-                name="email"
-                containerStyle={style.inputContainer}
-                inputStyle={style.textInput}
-                inputContainerStyle={{borderColor: '#f2f4f5'}}
-                leftIcon={<Icons name="envelope" size={16} color="#b8b8b8" />}
-                rightIcon={
-                  FormRegister.errors.email ? (
-                    <Icons size={15} color={'grey'} />
-                  ) : (
-                    <Icons name="check-circle" size={15} color={'#1d57b6'} />
-                  )
-                }
-              />
+
               <View style={{alignItems: 'center'}}>
                 <Button
                   title="Sign Up"
                   buttonStyle={style.button}
-                  // onPress={() => FormRegister.handleSubmit()}
-                  onPress={() => props.navigation.navigate('Verify')}
+                  onPress={FormRegister.handleSubmit}
                 />
               </View>
             </View>

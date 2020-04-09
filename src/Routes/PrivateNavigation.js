@@ -1,7 +1,5 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import Main from './Components/BottomNavigation';
-import Profile from '../Screens/Profile/Profile';
 import ChatList from '../Screens/Chat/ChatList';
 import ChatNavigation from './Components/ChatNavigation';
 import ChatID from '../Screens/Chat/ChatID';

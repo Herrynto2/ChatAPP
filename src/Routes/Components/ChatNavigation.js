@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Header from './Header';
 import Footer from './Footer';
 import ChatList from '../../Screens/Chat/ChatList';
-import Chat from '../../Screens/Chat/Chats';
+import Profile from '../../Screens/Profile/Profile';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -61,7 +61,7 @@ export default function ChatNavigation() {
         />
         <Tab.Screen
           name="Friends"
-          component={Chat}
+          component={Profile}
           style={{position: 'relative'}}
         />
       </Tab.Navigator>

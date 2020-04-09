@@ -14,36 +14,40 @@ import CustomInputText from '../../Components/CustomInputText';
 import * as Yup from 'yup';
 import Loader from '../../Components/Loader';
 import {useFormik} from 'formik';
+import {auth} from '../../Config/Firebase';
+import {userLogin} from '../../Redux/Actions/userDataAction';
+import {useDispatch} from 'react-redux';
 
 function Login(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
   const [isFocus, setIsFocus] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
 
+  const dispatch = useDispatch();
   const FormLogin = useFormik({
-    initialValues: {username: '', password: ''},
+    initialValues: {email: '', password: ''},
     validationSchema: Yup.object({
-      username: Yup.string()
-        .required('username is Required')
-        .min(6, 'username Must have min 6 character'),
+      email: Yup.string()
+        .email('Enter Valid Valid Email')
+        .required('Email is Required'),
       password: Yup.string().required('Password is Required'),
     }),
     onSubmit: async (values, form) => {
       setLoading(true);
       try {
-        // const response = await dispatch(userLogin(values));
-        // if (response.data && !response.data.success) {
-        CustomAlert(true, 'Login success');
-        // }
-        console.log('message');
+        await auth
+          .signInWithEmailAndPassword(values.email, values.password)
+          .then(response => {
+            dispatch(userLogin(response));
+            CustomAlert(true, 'Login success');
+            form.setSubmitting(false);
+            form.resetForm();
+          })
+          .catch(err => {
+            CustomAlert(false, err.message);
+          });
       } catch (err) {
-        // setLoading(false);
-        // console.log('er', err);
-        // if (!(err.message === 'Network Error')) {
-        //   if (err.response) {
-        //     CustomAlert(err.response.data.success, err.response.data.msg);
-        //   }
-        // }
+        CustomAlert(false, err.message);
       }
       setLoading(false);
     },
@@ -52,7 +56,6 @@ function Login(props) {
   return (
     <>
       <View style={style.container}>
-        {loading && <Loader loading={loading} setLoading={setLoading} />}
         <View style={{flex: 1, paddingBottom: 30}}>
           <TouchableOpacity
             style={{width: 50, marginTop: 25}}
@@ -71,14 +74,14 @@ function Login(props) {
             <View style={style.input}>
               <CustomInputText
                 form={FormLogin}
-                name="username"
-                placeholder="username"
+                name="email"
+                placeholder="email"
                 containerStyle={style.inputContainer}
                 inputStyle={style.textInput}
                 inputContainerStyle={{borderColor: '#f2f4f5'}}
-                leftIcon={<Icons name="user" size={16} color="#b8b8b8" />}
+                leftIcon={<Icons name="envelope" size={16} color="#b8b8b8" />}
                 rightIcon={
-                  FormLogin.errors.username ? (
+                  FormLogin.errors.email ? (
                     <Icons size={15} color={'grey'} />
                   ) : (
                     <Icons name="check-circle" size={15} color={'#1d57b6'} />
@@ -113,7 +116,11 @@ function Login(props) {
               </View>
             </TouchableOpacity>
             <View style={{alignItems: 'center'}}>
-              <Button title="Login" buttonStyle={style.button} />
+              <Button
+                title="Login"
+                buttonStyle={style.button}
+                onPress={FormLogin.handleSubmit}
+              />
             </View>
             <Text style={style.textSignup}>Login Via</Text>
             <View style={style.containOtherLog}>
@@ -126,7 +133,7 @@ function Login(props) {
               <TouchableOpacity>
                 <Button
                   icon={<Icons name="google" size={16} color="white" />}
-                  onPress={FormLogin.handleSubmit}
+                  onPress={() => setLoading(true)}
                   buttonStyle={{
                     ...style.anotherLogin,
                     backgroundColor: '#df4c4f',
@@ -149,6 +156,7 @@ function Login(props) {
             </View>
           </ScrollView>
         </View>
+        {loading && <Loader loading={loading} setLoading={setLoading} />}
       </View>
     </>
   );
