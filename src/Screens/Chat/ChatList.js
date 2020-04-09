@@ -8,6 +8,7 @@ import {YellowBox} from 'react-native';
 YellowBox.ignoreWarnings([
   'Setting a timer for a long period of time',
   'Warning: Failed child context type: Invalid child context',
+  `Warning: Can't perform a React state update `,
 ]);
 
 function ChatList(props) {

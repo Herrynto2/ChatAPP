@@ -42,18 +42,24 @@ function ChatID(props) {
               </View>
             ))}
 
-            <View style={style.chatSenderList}>
-              <View style={{marginTop: -20, marginLeft: 30}}>
-                <Text style={style.senderDate}>Sunday, 13:15</Text>
-                <Text style={style.senderMsg}>
-                  Hello im a studdent in politechnic palembang and mayor is
-                  nurse
-                </Text>
+            {chatsPartner.map((v, i) => (
+              <View style={style.chatSenderList}>
+                <View style={{marginTop: -20, marginLeft: 30}}>
+                  <Text style={style.senderDate}>Sunday, 13:15</Text>
+
+                  {/* {v.chat.map((v, i) => (
+                    <> */}
+                  <Text style={style.senderMsg}>
+                    {'lalalalalallllllllllllllllllllllllllllllllll'}
+                  </Text>
+                  {/* </>
+                  ))} */}
+                </View>
+                <TouchableOpacity style={{height: 50}}>
+                  <Image source={User} style={style.senderImage} />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={{height: 50}}>
-                <Image source={User} style={style.senderImage} />
-              </TouchableOpacity>
-            </View>
+            ))}
           </ScrollView>
         </View>
       </View>
@@ -100,9 +106,8 @@ const style = StyleSheet.create({
   },
   chatSenderList: {
     flexDirection: 'row',
-    marginTop: 25,
-    paddingRight: 25,
     marginTop: 30,
+    paddingRight: 25,
   },
   friendsImage: {
     width: 40,
@@ -147,6 +152,7 @@ const style = StyleSheet.create({
     color: 'white',
     padding: 5,
     fontSize: 13,
+    marginTop: 8,
     paddingHorizontal: 14,
     borderTopLeftRadius: 10,
     borderBottomRightRadius: 10,

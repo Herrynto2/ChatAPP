@@ -5,6 +5,7 @@ import ChatNavigation from './Components/ChatNavigation';
 import ChatID from '../Screens/Chat/ChatID';
 import Profile from '../Screens/Profile/Profile';
 import SetMenu from '../Screens/Profile/SetMenu';
+import AddFriends from '../Screens/Contact/AddFriends';
 
 function PrivateNavigation(props) {
   const Stack = createStackNavigator();
@@ -18,6 +19,7 @@ function PrivateNavigation(props) {
       <Stack.Screen name="ChatID" component={ChatID} />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="SetMenu" component={SetMenu} />
+      <Stack.Screen name="AddFriends" component={AddFriends} />
     </Stack.Navigator>
   );
 }

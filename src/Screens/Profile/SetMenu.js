@@ -4,9 +4,16 @@ import {Button, Overlay} from 'react-native-elements';
 import User from '../../Helper/Image/user3.jpg';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import {YellowBox} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {userLogout} from '../../Redux/Actions/userDataAction';
+import {useNavigation} from '@react-navigation/native';
+
 YellowBox.ignoreWarnings(['Warning: Failed prop type: Invalid prop']);
 
 function SetMenu(props) {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
   return (
     <View>
       <Overlay
@@ -20,7 +27,12 @@ function SetMenu(props) {
         overlayStyle={style.container}>
         <View style={{backgroundColor: '#1d57b6'}}>
           <View style={{alignSelf: 'center', height: 80}}>
-            <TouchableOpacity style={{height: 110, marginTop: 30}}>
+            <TouchableOpacity
+              style={{height: 110, marginTop: 30}}
+              onPress={() => {
+                navigation.navigate('Profile');
+                props.setHideVisible(false);
+              }}>
               <Image source={User} style={style.imgUser} />
             </TouchableOpacity>
           </View>
@@ -41,7 +53,7 @@ function SetMenu(props) {
           <Button
             title="Logout"
             icon={<Icons name="sign-out-alt" size={16} color="white" />}
-            onPress={() => props.navigation.navigate('Profile')}
+            onPress={async () => await dispatch(userLogout())}
             buttonStyle={style.btnLogout}
             label
           />
