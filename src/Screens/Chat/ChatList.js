@@ -4,6 +4,11 @@ import {Avatar, ListItem, Button} from 'react-native-elements';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import ChatTop from './ChatTop';
 import ListChat from './Components/ListChat';
+import {YellowBox} from 'react-native';
+YellowBox.ignoreWarnings([
+  'Setting a timer for a long period of time',
+  'Warning: Failed child context type: Invalid child context',
+]);
 
 function ChatList(props) {
   return (

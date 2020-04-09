@@ -7,7 +7,7 @@ function Profile(props) {
       <View
         style={{
           borderRadius: 50,
-          backgroundColor: 'grey',
+          backgroundColor: 'white',
           flex: 1,
           marginBottom: -50,
         }}>

@@ -13,6 +13,8 @@ import User from '../../Helper/Image/user3.jpg';
 import Header from './Components/Header';
 import {ScrollView} from 'react-native-gesture-handler';
 import chatsPartner from './Components/PartnerChat';
+import {YellowBox} from 'react-native';
+YellowBox.ignoreWarnings(['Warning: Each child in a list should']);
 
 function ChatID(props) {
   return (

@@ -20,7 +20,6 @@ import {useDispatch} from 'react-redux';
 
 function Login(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
-  const [isFocus, setIsFocus] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
 
   const dispatch = useDispatch();

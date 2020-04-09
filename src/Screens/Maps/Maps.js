@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, Image, TextInput} from 'react-native';
 import {Button, Input} from 'react-native-elements';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
-import {db} from './src/Config/Firebase';
+import {db} from '../../Config/Firebase';
 import {FlatList} from 'react-native-gesture-handler';
 
 export default class Maps extends Component {
@@ -88,46 +88,6 @@ export default class Maps extends Component {
               })}
           </MapView>
         </View>
-        <View style={{flex: 1}}>
-          <Input
-            value={this.state.name}
-            onChangeText={text => {
-              this.setState({name: text});
-            }}
-            placeholder="input"
-            inputContainerStyle={style.input}
-          />
-          <Input
-            value={this.state.latitude}
-            onChangeText={text => {
-              this.setState({latitude: text});
-            }}
-            placeholder="Latitude"
-            inputContainerStyle={style.input}
-          />
-          <Input
-            value={this.state.longitude}
-            onChangeText={text => {
-              this.setState({longitude: text});
-            }}
-            placeholder="Longitude"
-            inputContainerStyle={style.input}
-          />
-
-          <Button title="Search" onPress={this.handleSend} />
-          <FlatList
-            data={this.state.data}
-            renderItem={({item, index}) => {
-              return (
-                <Text>
-                  {''}
-                  {index + 1}
-                  {item.name}
-                </Text>
-              );
-            }}
-          />
-        </View>
       </View>
     );
   }
@@ -138,14 +98,12 @@ const style = StyleSheet.create({
     height: 400,
     width: 400,
     flex: 1,
-    borderWidth: 2,
   },
   map: {width: '100%', height: '100%'},
   user: {
     width: 50,
     height: 50,
     borderRadius: 100,
-    borderWidth: 2,
     borderColor: '#0aa1e3',
   },
   input: {
