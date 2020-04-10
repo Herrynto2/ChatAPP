@@ -18,16 +18,15 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Loader from '../../Components/Loader';
 import ImagePicker from 'react-native-image-picker';
-import {db, storage} from '../../Config/Firebase';
+import {db, storage, auth} from '../../Config/Firebase';
 
 function Profile(props) {
   const [srcImageUpdate, setSrcImageUpdate] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const {dataProfile, dataUser} = useSelector(state => state.userData);
-
+  const uname = dataUser.email.substring(0, 8);
   const dispatch = useDispatch();
   const FormUpdateUser = useFormik({
-    enableReinitialize: true,
     initialValues: {...dataProfile} || {},
     validationSchema: Yup.object({
       fullname: Yup.string().nullable(),
@@ -40,6 +39,22 @@ function Profile(props) {
     onSubmit: async (values, form) => {
       setLoading(true);
       try {
+        const uriToBlob = uri => {
+          return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+              resolve(xhr.response);
+            };
+
+            xhr.onerror = function() {
+              reject(new Error('uriToBlob failed'));
+            };
+            xhr.responseType = 'blob';
+            xhr.open('GET', uri, true);
+
+            xhr.send(null);
+          });
+        };
         const formData = new FormData();
         const fillAble = ['fullname', 'email', 'information', 'picture'];
         fillAble
@@ -61,41 +76,27 @@ function Profile(props) {
               });
             }
           });
-        try {
-          await db.ref(`user-data/${dataUser.uid}`).update({
+        const image = await storage
+          .ref(`data-user/${dataUser.uid}`)
+          .put(await uriToBlob(values.picture.uri), {
+            contentType: values.picture.type,
+          });
+        console.log('image', image);
+        if (image) {
+          console.log('apaaj');
+          const urlPicture = await storage
+            .ref(image.metadata.fullPath)
+            .getDownloadURL();
+          const update = await db.ref(`user-data/${dataUser.uid}`).update({
             fullname: values.fullname,
             information: values.information,
+            picture: urlPicture,
           });
-          const image = await storage
-            .ref(`data-user/${dataUser.uid}`)
-            .put(values.picture.uri);
-
-          // .then(res => {
-          //   console.log(res);
-          //   db.ref(`user-data/${dataUser.uid}`)
-          //     .once('value', data => {
-          //       dispatch(updateProfile(data));
-          //     })
-          //     .catch(err => {
-          //       console.log(err);
-          //     });
-          //   CustomAlert(true, 'Update profile successs');
-          // })
-          // .catch(err => {
-          //   // CustomAlert(false, err);
-          //   console.log(err);
-          // });
-        } catch (err) {
-          // CustomAlert(false, error);
-          console.log('error', err);
+          const get = await db.ref(`user-data/${dataUser.uid}`).once('value');
+          CustomAlert(true, 'Update profile successs');
         }
       } catch (err) {
-        // CustomAlert(false, er);
-        // if (!(err.message === 'Network Error')) {
-        //   if (err.response) {
-        //     CustomAlert(err.response.data.success, err.response.data.msg);
-        //   }
-        // }
+        console.log('err', err);
       }
       setLoading(false);
     },

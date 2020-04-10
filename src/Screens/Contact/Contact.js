@@ -2,8 +2,27 @@ import React from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import {ListItem, SearchBar} from 'react-native-elements';
 import Data from './Component/Data';
+import {db} from '../../Config/Firebase';
+import {useSelector, useDispatch} from 'react-redux';
 
 function Contact(props) {
+  const {dataProfile, dataUser} = useSelector(state => state.userData);
+  const [contact, setContact] = React.useState([]);
+
+  React.useEffect(() => {
+    var obj = {a: {}, b: {}, c: {}};
+
+    const get = db
+      .ref(`user-data`)
+      .once('value', data => {
+        console.log(data);
+      })
+
+      .catch(err => {
+        console.log(err);
+      });
+  });
+
   return (
     <>
       <View

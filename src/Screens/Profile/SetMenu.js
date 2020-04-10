@@ -42,7 +42,9 @@ function SetMenu(props) {
           <Text style={style.nameUser}>
             {dataProfile.fullname || dataUser.email.substring(0, 8)}
           </Text>
-          <Text style={{...style.nameUser, backgroundColor:'transpare'}}>{dataProfile.information}</Text>
+          <Text style={{...style.nameUser, backgroundColor: 'transpare'}}>
+            {dataProfile.information}
+          </Text>
         </View>
         <View>
           <TouchableOpacity
@@ -124,7 +126,7 @@ const style = StyleSheet.create({
     borderRadius: 10,
   },
   containerLogout: {
-    marginTop: 200,
+    marginTop: 100,
     height: '27%',
     padding: 20,
     paddingTop: 60,
