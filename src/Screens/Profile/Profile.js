@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {Icon, Button} from 'react-native-elements';
 import Icons from 'react-native-vector-icons/FontAwesome5';
-import user from '../../Helper/Image/user3.jpg';
+import user from '../../Helper/Image/users.png';
 import CustomInputText from '../../Components/CustomInputText';
 import CustomAlert from '../../Components/CustomAlert';
 import {updateProfile} from '../../Redux/Actions/userDataAction';
@@ -18,13 +18,14 @@ import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Loader from '../../Components/Loader';
 import ImagePicker from 'react-native-image-picker';
+import {db, storage} from '../../Config/Firebase';
 
 function Profile(props) {
   const [srcImageUpdate, setSrcImageUpdate] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+  const {dataProfile, dataUser} = useSelector(state => state.userData);
 
-  const {dataProfile} = useSelector(state => state.userData);
-
+  const dispatch = useDispatch();
   const FormUpdateUser = useFormik({
     enableReinitialize: true,
     initialValues: {...dataProfile} || {},
@@ -60,15 +61,36 @@ function Profile(props) {
               });
             }
           });
-        // const response = await patchData('profile', formData);
-        // if (response.data && response.data.success) {
-        //   await dispatch(updateProfile());
-        //   CustomAlert(response.data.success, response.data.msg);
-        // } else {
-        //   CustomAlert(response.data.success, response.data.msg);
-        // }
+        try {
+          await db.ref(`user-data/${dataUser.uid}`).update({
+            fullname: values.fullname,
+            information: values.information,
+          });
+          const image = await storage
+            .ref(`data-user/${dataUser.uid}`)
+            .putFile(values.picture.uri);
+
+          // .then(res => {
+          //   console.log(res);
+          //   db.ref(`user-data/${dataUser.uid}`)
+          //     .once('value', data => {
+          //       dispatch(updateProfile(data));
+          //     })
+          //     .catch(err => {
+          //       console.log(err);
+          //     });
+          //   CustomAlert(true, 'Update profile successs');
+          // })
+          // .catch(err => {
+          //   // CustomAlert(false, err);
+          //   console.log(err);
+          // });
+        } catch (err) {
+          // CustomAlert(false, error);
+          console.log('error', err);
+        }
       } catch (err) {
-        console.log(err);
+        // CustomAlert(false, er);
         // if (!(err.message === 'Network Error')) {
         //   if (err.response) {
         //     CustomAlert(err.response.data.success, err.response.data.msg);
@@ -86,7 +108,6 @@ function Profile(props) {
     };
     ImagePicker.showImagePicker(options, response => {
       if (response.uri) {
-        console.log(response);
         setSrcImageUpdate(response.uri);
         FormUpdateUser.setFieldValue('picture', response);
       }
@@ -96,6 +117,7 @@ function Profile(props) {
   return (
     <>
       <View style={{backgroundColor: '#1e58b5', height: 70}}>
+        {loading && <Loader loading={loading} setLoading={setLoading} />}
         <TouchableOpacity
           style={{width: 50, marginTop: 35}}
           onPress={() => props.navigation.goBack()}>
@@ -111,7 +133,12 @@ function Profile(props) {
         <View style={style.container}>
           <View style={{alignSelf: 'center', marginBottom: 40}}>
             <Image
-              source={user}
+              source={
+                ((srcImageUpdate || dataProfile.picture) && {
+                  uri: srcImageUpdate,
+                }) ||
+                user
+              }
               style={{width: 160, height: 160, borderRadius: 100}}
             />
             <TouchableOpacity

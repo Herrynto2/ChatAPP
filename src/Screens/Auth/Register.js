@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 import Loader from '../../Components/Loader';
 import {useFormik} from 'formik';
 import Icons from 'react-native-vector-icons/FontAwesome5';
-import {auth} from '../../Config/Firebase';
+import {auth, db} from '../../Config/Firebase';
 
 function Register(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
@@ -41,7 +41,15 @@ function Register(props) {
       try {
         await auth
           .createUserWithEmailAndPassword(values.email, values.password)
-          .then(u => {
+          .then(res => {
+            if (res) {
+              db.ref(`user-data/${auth.currentUser.uid}`)
+                .set({email: values.email})
+                .then(response => console.log(response))
+                .catch(error => {
+                  console.log('err', error);
+                });
+            }
             CustomAlert(true, 'register success');
             form.setSubmitting(false);
             form.resetForm();

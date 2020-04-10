@@ -15,7 +15,7 @@ import * as Yup from 'yup';
 import Loader from '../../Components/Loader';
 import {useFormik} from 'formik';
 import {auth} from '../../Config/Firebase';
-import {userLogin} from '../../Redux/Actions/userDataAction';
+import {userLogin, updateProfile} from '../../Redux/Actions/userDataAction';
 import {useDispatch} from 'react-redux';
 
 function Login(props) {

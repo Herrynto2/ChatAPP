@@ -7,7 +7,7 @@ import {
 
 export const userLogin = data => async dispatch => {
   try {
-    const response = data;
+    const response = data.user;
     if (response) {
       await dispatch({
         type: USER_LOGIN,
@@ -44,8 +44,5 @@ export const updateProfile = data => async dispatch => {
     return response.data;
   } catch (err) {
     console.log('error', err);
-    // if (!(err.message === 'Network Error')) {
-    //   throw err;
-    // }
   }
 };

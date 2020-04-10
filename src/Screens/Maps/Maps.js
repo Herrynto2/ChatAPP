@@ -1,113 +1,64 @@
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Image, TextInput} from 'react-native';
-import {Button, Input} from 'react-native-elements';
+import React from 'react';
+import {View, Text, StyleSheet, PermissionsAndroid} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
-import {db} from '../../Config/Firebase';
-import {FlatList} from 'react-native-gesture-handler';
-
-export default class Maps extends Component {
-  state = {
-    name: '',
-    data: [],
-    latitude: '',
-    longitude: '',
-  };
-
-  addData = (name, latitude, longitude) => {
-    try {
-      db.ref('/data-name').push({
-        name,
-        latitude,
-        longitude,
-      });
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  handleSend = () => {
-    const {name, latitude, longitude} = this.state;
-    this.addData(name, latitude, longitude);
-    // this.setState({name: '', latitude: '', longitude: ''});
-  };
-
-  componentDidMount() {
-    this.listenData();
-  }
-
-  listenData = () => {
-    let itemsRef = db.ref('data-name');
-    itemsRef.on('value', res => {
-      let data = res.val();
-      if (data) {
-        const objectArray = Object.values(data);
-        this.setState({data: objectArray});
-        console.log('data', objectArray);
-      }
-    });
-  };
-
-  handleMove = () => {
-    this.refs.map.animateToRegion(
-      {
-        latitude: -2.976677,
-        longitude: 106.8959383,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.0101,
+import geolocation from '@react-native-community/geolocation';
+export default function Maps(props) {
+  const [currentPosition, setCurrentPosition] = React.useState(false);
+  React.useEffect(() => {
+    geolocation.getCurrentPosition(
+      position => {
+        if (position) {
+          console.log(position.coords);
+          setCurrentPosition(position.coords);
+        }
       },
-      2000,
+      err => {
+        if (err.code === 1) {
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
+        } else if (err.code === 2) {
+          console.log('error');
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 60000,
+        maximumAge: 1000,
+      },
     );
-  };
-
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <View style={style.container}>
-          <MapView
-            ref="map"
-            provider={PROVIDER_GOOGLE}
-            style={style.map}
-            initialRegion={{
-              latitude: -6.3876732,
-              longitude: 106.7477557,
-              latitudeDelta: 0.015,
-              longitudeDelta: 0.0121,
-            }}>
-            {this.state.data.length > 0 &&
-              this.state.data.map((item, val) => {
-                console.log(item);
-                return (
-                  <Marker
-                    title={item.name}
-                    coordinate={{
-                      latitude: parseFloat(item.latitude),
-                      longitude: parseFloat(item.longitude),
-                    }}
-                  />
-                );
-              })}
-          </MapView>
-        </View>
-      </View>
-    );
-  }
+  }, []);
+  return (
+    <View>
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        region={{
+          latitude: currentPosition
+            ? currentPosition.latitude
+            : -6.8205799999999995,
+          longitude: currentPosition
+            ? currentPosition.longitude
+            : 106.81851166666665,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.0021,
+        }}>
+        <Marker
+          coordinate={{
+            latitude: currentPosition
+              ? currentPosition.latitude
+              : -6.8205799999999995,
+            longitude: currentPosition
+              ? currentPosition.longitude
+              : 106.81851166666665,
+          }}
+        />
+      </MapView>
+    </View>
+  );
 }
 
-const style = StyleSheet.create({
-  container: {
-    height: 400,
-    width: 400,
-    flex: 1,
-  },
-  map: {width: '100%', height: '100%'},
-  user: {
-    width: 50,
-    height: 50,
-    borderRadius: 100,
-    borderColor: '#0aa1e3',
-  },
-  input: {
-    backgroundColor: 'white',
-    paddingLeft: 20,
+const styles = StyleSheet.create({
+  map: {
+    height: '100%',
+    width: '100%',
   },
 });

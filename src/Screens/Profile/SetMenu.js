@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import {Button, Overlay} from 'react-native-elements';
-import User from '../../Helper/Image/user3.jpg';
+import user from '../../Helper/Image/users.png';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import {YellowBox} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,6 +13,7 @@ YellowBox.ignoreWarnings(['Warning: Failed prop type: Invalid prop']);
 function SetMenu(props) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const {dataProfile, dataUser} = useSelector(state => state.userData);
 
   return (
     <View>
@@ -33,12 +34,15 @@ function SetMenu(props) {
                 navigation.navigate('Profile');
                 props.setHideVisible(false);
               }}>
-              <Image source={User} style={style.imgUser} />
+              <Image source={user} style={style.imgUser} />
             </TouchableOpacity>
           </View>
         </View>
         <View style={{alignSelf: 'center'}}>
-          <Text style={style.nameUser}>Kevinza</Text>
+          <Text style={style.nameUser}>
+            {dataProfile.fullname || dataUser.email.substring(0, 8)}
+          </Text>
+          <Text style={{...style.nameUser, backgroundColor:'transpare'}}>{dataProfile.information}</Text>
         </View>
         <View>
           <TouchableOpacity
@@ -115,7 +119,7 @@ const style = StyleSheet.create({
     backgroundColor: '#4b84e9',
     width: '50%',
     textAlign: 'center',
-    paddingHorizontal: 7,
+    paddingHorizontal: 10,
     paddingVertical: 2,
     borderRadius: 10,
   },
