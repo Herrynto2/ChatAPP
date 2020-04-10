@@ -68,7 +68,7 @@ function Profile(props) {
           });
           const image = await storage
             .ref(`data-user/${dataUser.uid}`)
-            .putFile(values.picture.uri);
+            .put(values.picture.uri);
 
           // .then(res => {
           //   console.log(res);
