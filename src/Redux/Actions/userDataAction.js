@@ -3,6 +3,7 @@ import {
   USER_LOGOUT,
   CLEAR_HISTORY,
   UPDATE_PROFILE,
+  LIST_MESSAGE,
 } from './actionTypes';
 
 export const userLogin = data => async dispatch => {
@@ -42,6 +43,21 @@ export const updateProfile = data => async dispatch => {
       });
     }
     return response.data;
+  } catch (err) {
+    console.log('error', err);
+  }
+};
+
+export const chatList = data => async dispatch => {
+  try {
+    const response = data;
+    if (response) {
+      await dispatch({
+        type: chatList,
+        payload: response,
+      });
+    }
+    return response;
   } catch (err) {
     console.log('error', err);
   }

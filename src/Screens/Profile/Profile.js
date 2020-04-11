@@ -22,10 +22,17 @@ import {db, storage, auth} from '../../Config/Firebase';
 
 function Profile(props) {
   const [srcImageUpdate, setSrcImageUpdate] = React.useState('');
+  const [dataUsers, setDataUser] = React.useState({});
   const [loading, setLoading] = React.useState(false);
   const {dataProfile, dataUser} = useSelector(state => state.userData);
-  const uname = dataUser.email.substring(0, 8);
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    const get = db.ref(`user-data/${dataUser.uid}`).once('value', data => {
+      setDataUser(data);
+    });
+  }, []);
+
   const FormUpdateUser = useFormik({
     initialValues: {...dataProfile} || {},
     validationSchema: Yup.object({
@@ -81,7 +88,6 @@ function Profile(props) {
           .put(await uriToBlob(values.picture.uri), {
             contentType: values.picture.type,
           });
-        console.log('image', image);
         if (image) {
           console.log('apaaj');
           const urlPicture = await storage
@@ -92,7 +98,13 @@ function Profile(props) {
             information: values.information,
             picture: urlPicture,
           });
-          const get = await db.ref(`user-data/${dataUser.uid}`).once('value');
+          const get = db
+            .ref(`user-data/${dataUser.uid}`)
+            .once('value', data => {
+              setDataUser(data);
+              dispatch(updateProfile(data));
+            });
+
           CustomAlert(true, 'Update profile successs');
         }
       } catch (err) {
@@ -136,7 +148,7 @@ function Profile(props) {
             <Image
               source={
                 ((srcImageUpdate || dataProfile.picture) && {
-                  uri: srcImageUpdate,
+                  uri: srcImageUpdate || dataProfile.picture,
                 }) ||
                 user
               }

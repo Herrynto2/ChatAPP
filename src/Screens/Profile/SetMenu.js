@@ -34,7 +34,15 @@ function SetMenu(props) {
                 navigation.navigate('Profile');
                 props.setHideVisible(false);
               }}>
-              <Image source={user} style={style.imgUser} />
+              <Image
+                source={
+                  (dataProfile.picture && {
+                    uri: dataProfile.picture,
+                  }) ||
+                  user
+                }
+                style={style.imgUser}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -91,7 +99,6 @@ const style = StyleSheet.create({
   },
   closeMenu: {
     width: 50,
-    marginTop: 25,
     height: 100,
     backgroundColor: 'white',
     justifyContent: 'center',
@@ -102,7 +109,7 @@ const style = StyleSheet.create({
     position: 'absolute',
     right: 0,
     marginRight: -10,
-    marginTop: 50,
+    marginTop: -40,
   },
   imgUser: {
     width: 110,

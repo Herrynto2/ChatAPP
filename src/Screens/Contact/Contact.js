@@ -9,19 +9,29 @@ function Contact(props) {
   const {dataProfile, dataUser} = useSelector(state => state.userData);
   const [contact, setContact] = React.useState([]);
 
+  const dataContact = Object.keys(contact).map(key => ({
+    ...contact[key],
+    key: key,
+  }));
+
   React.useEffect(() => {
-    var obj = {a: {}, b: {}, c: {}};
-
-    const get = db
-      .ref(`user-data`)
-      .once('value', data => {
-        console.log(data);
-      })
-
-      .catch(err => {
-        console.log(err);
-      });
-  });
+    let get = db.ref(`user-data`);
+    get.on('value', res => {
+      let data = res.val();
+      const keys = Object.keys(data);
+      const values = Object.values(data);
+      console.log(data);
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] !== dataUser.uid) {
+          setContact(prevState => ({
+            ...prevState,
+            [keys[i]]: values[i],
+          }));
+        } else {
+        }
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -50,37 +60,38 @@ function Contact(props) {
               color: '#5c5b5b',
               textAlign: 'right',
             }}>
-            Friends 23
+            Friends {Object.keys(contact).length}
           </Text>
         </View>
         <View style={{marginTop: 20, flex: 10}}>
           <FlatList
             style={{paddingHorizontal: 20}}
             keyExtractor={(item, index) => index}
-            data={Data}
+            data={dataContact}
             renderItem={({item, index}) => (
               <TouchableOpacity
                 onPress={() =>
                   props.navigation.navigate('ChatID', {
-                    name: item.name,
-                    image: item.image,
+                    name: item.fullname,
+                    picture: item.picture,
+                    email: item.email,
+                    id: item.key,
                   })
                 }>
                 <ListItem
                   containerStyle={{backgroundColor: '#ebeaee'}}
-                  title={item.name}
+                  title={item.fullname}
                   titleStyle={style.nameUser}
                   subtitle={
                     <View>
-                      {/* <Text style={style.message}>
-                          {item.msg.substring(0, 80)} .....
-                        </Text> */}
-                      <Text style={style.status}>{item.status}</Text>
+                      <Text style={style.status}>
+                        {item.information && item.information.substring(0, 20)}
+                      </Text>
                     </View>
                   }
                   bottomDivider
                   leftAvatar={{
-                    source: item.image,
+                    source: {uri: item.picture},
                   }}
                 />
               </TouchableOpacity>

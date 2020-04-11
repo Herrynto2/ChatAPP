@@ -1,8 +1,14 @@
-import {USER_LOGIN, USER_LOGOUT, UPDATE_PROFILE} from '../Actions/actionTypes';
+import {
+  USER_LOGIN,
+  USER_LOGOUT,
+  UPDATE_PROFILE,
+  LIST_MESSAGE,
+} from '../Actions/actionTypes';
 const initialState = {
   isLogin: false,
   dataProfile: {},
   dataUser: {},
+  dataChat: [],
 };
 
 export default function userData(state = initialState, action) {
@@ -19,6 +25,11 @@ export default function userData(state = initialState, action) {
       return {
         ...state,
         dataProfile: action.payload,
+      };
+    case LIST_MESSAGE:
+      return {
+        ...state,
+        dataChat: action.payload,
       };
     default:
       return state;
