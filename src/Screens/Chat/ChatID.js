@@ -17,7 +17,7 @@ import {YellowBox} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {db} from '../../Config/Firebase';
 import {DatePickerAndroid} from 'react-native';
-import {} from '../../Redux/Actions/userDataAction';
+import {chatList} from '../../Redux/Actions/userDataAction';
 
 YellowBox.ignoreWarnings(['Warning: Each child in a list should']);
 
@@ -25,29 +25,44 @@ function ChatID(props) {
   const [textMessage, setMessage] = React.useState('');
   const [messageList, setMessageList] = React.useState([]);
   const {dataUser} = useSelector(state => state.userData);
-
-  const dispatch = useDispatch();
+  const {dataChat} = useSelector(state => state.userChat);
   const messageListArr = Object.keys(messageList).map(key => ({
     ...messageList[key],
     key: key,
   }));
+  const dispatch = useDispatch();
   console.log('messsage', messageListArr);
 
   React.useEffect(() => {
+    const gets = db
+      .ref('chat-room')
+      .child(dataUser.uid)
+      .on('value', res => {
+        console.log('res', res);
+      });
+
     const get = db
       .ref('chat-room')
       .child(dataUser.uid)
       .child(props.route.params.id)
       .on('value', value => {
-        let data = value.val();
-        const keys = Object.keys(data);
-        const values = Object.values(data);
-        // console.log(values);
-        for (let i = 0; i < keys.length; i++) {
-          setMessageList(prevState => ({
-            ...prevState,
-            [keys[i]]: values[i],
-          }));
+        console.log('val', value);
+        if (value) {
+          let data = value.val();
+          if (data === null) {
+            console.log('err');
+          } else {
+            const keys = Object.keys(data);
+            const values = Object.values(data);
+            for (let i = 0; i < keys.length; i++) {
+              setMessageList(prevState => ({
+                ...prevState,
+                [keys[i]]: values[i],
+              }));
+            }
+          }
+        } else {
+          console.log('error');
         }
       });
   }, []);
@@ -87,6 +102,11 @@ function ChatID(props) {
                   [keys[i]]: values[i],
                 }));
               }
+              const messageListArr = Object.keys(messageList).map(key => ({
+                ...messageList[key],
+                key: key,
+              }));
+              dispatch(chatList(messageListArr));
               setMessage('');
             });
         }
@@ -223,7 +243,7 @@ const style = StyleSheet.create({
   },
   chatList: {
     flexDirection: 'row',
-    marginTop: 13,
+    marginTop: 16,
     marginBottom: -20,
     marginRight: -25,
   },
@@ -265,11 +285,14 @@ const style = StyleSheet.create({
     marginLeft: -35,
   },
   senderDate: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#bdbdbd',
-    marginBottom: -6,
     textAlign: 'right',
     paddingRight: 50,
+    position: 'absolute',
+    left: 0,
+    marginTop: 24,
+    marginLeft: -32,
   },
   senderMsg: {
     backgroundColor: '#1e57b6',

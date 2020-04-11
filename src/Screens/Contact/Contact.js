@@ -4,19 +4,22 @@ import {ListItem, SearchBar} from 'react-native-elements';
 import Data from './Component/Data';
 import {db} from '../../Config/Firebase';
 import {useSelector, useDispatch} from 'react-redux';
+import user from '../../Helper/Image/users.png';
 
 function Contact(props) {
-  const {dataProfile, dataUser} = useSelector(state => state.userData);
+  const {dataUser} = useSelector(state => state.userData);
   const [contact, setContact] = React.useState([]);
 
   const dataContact = Object.keys(contact).map(key => ({
     ...contact[key],
     key: key,
   }));
+  console.log('contact', dataContact);
 
   React.useEffect(() => {
-    let get = db.ref(`user-data`);
+    let get = db.ref(`user-data/${dataUser.uid}/friends`);
     get.on('value', res => {
+      console.log('contact', res);
       let data = res.val();
       const keys = Object.keys(data);
       const values = Object.values(data);
@@ -80,7 +83,7 @@ function Contact(props) {
                 }>
                 <ListItem
                   containerStyle={{backgroundColor: '#ebeaee'}}
-                  title={item.fullname}
+                  title={item.fullname || item.email.substring(0, 6)}
                   titleStyle={style.nameUser}
                   subtitle={
                     <View>
@@ -91,7 +94,7 @@ function Contact(props) {
                   }
                   bottomDivider
                   leftAvatar={{
-                    source: {uri: item.picture},
+                    source: item.picture === '' ? user : {uri: item.picture},
                   }}
                 />
               </TouchableOpacity>

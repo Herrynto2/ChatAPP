@@ -53,7 +53,7 @@ export const chatList = data => async dispatch => {
     const response = data;
     if (response) {
       await dispatch({
-        type: chatList,
+        type: LIST_MESSAGE,
         payload: response,
       });
     }

@@ -9,17 +9,87 @@ import {
 } from 'react-native';
 import {Icon, Button, SearchBar} from 'react-native-elements';
 import Icons from 'react-native-vector-icons/FontAwesome5';
-import user from '../../Helper/Image/user3.jpg';
+import user from '../../Helper/Image/users.png';
 import Empty from '../../Helper/Image/notfound.jpg';
-import CustomInputText from '../../Components/CustomInputText';
+import Loader from '../../Components/Loader';
+import {db} from '../../Config/Firebase';
+import {useSelector, useDispatch} from 'react-redux';
 import CustomAlert from '../../Components/CustomAlert';
 
 function AddFriends(props) {
   const [isAvailable, setIsAvailable] = React.useState(false);
+  const [textMessage, setMessage] = React.useState('');
+  const [dataSearch, setDataSearch] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const {dataUser} = useSelector(state => state.userData);
+
+  console.log(dataUser.uid);
+
+  const handleSearch = async () => {
+    if (textMessage.length > 0) {
+      setLoading(true);
+      try {
+        const search = await db
+          .ref('user-data/')
+          .orderByChild('email')
+          .startAt(textMessage)
+          .endAt(textMessage)
+          .on('value', function(res) {
+            if (res) {
+              let data = res.val();
+              if (data === null) {
+                setDataSearch([]);
+              } else if (Object.keys(data)[0] === dataUser.uid) {
+                setDataSearch([]);
+              } else {
+                const dataUsers = Object.keys(data).map(key => ({
+                  ...data[key],
+                  key: key,
+                }));
+                db.ref(`user-data/${dataUser.uid}/friends/`)
+                  .orderByChild('email')
+                  .startAt(dataUsers[0].email)
+                  .endAt(dataUsers[0].email)
+                  .on('value', res => {
+                    if (res) {
+                      let datas = res.val();
+                      if (datas === null) {
+                        setIsAvailable(false);
+                      } else {
+                        setIsAvailable(true);
+                      }
+                    }
+                  });
+                setDataSearch(dataUsers);
+              }
+            } else {
+            }
+          });
+      } catch (error) {}
+      setLoading(false);
+    }
+  };
+
+  const handleAdd = async () => {
+    try {
+      const data = {
+        id: dataSearch[0].key,
+        fullname: dataSearch[0].fullname || '',
+        email: dataSearch[0].email,
+        picture: dataSearch[0].picture || '',
+      };
+      const add = await db
+        .ref('user-data')
+        .child(dataUser.uid)
+        .child('friends')
+        .push(data);
+    } catch (error) {}
+  };
 
   return (
     <>
       <View style={{backgroundColor: '#1e58b5', height: 70}}>
+        {loading && <Loader loading={loading} setLoading={setLoading} />}
         <TouchableOpacity
           style={{width: 50, marginTop: 35}}
           onPress={() => props.navigation.goBack()}>
@@ -35,11 +105,23 @@ function AddFriends(props) {
         <View style={style.container}>
           <SearchBar
             placeholder="Type Here..."
+            value={textMessage}
+            onChangeText={textMessage => setMessage(textMessage)}
             containerStyle={style.seacrhContainer}
             inputContainerStyle={style.seacrhInput}
             inputStyle={{fontSize: 14}}
           />
-          {isAvailable && (
+
+          <Button
+            onPress={handleSearch}
+            icon={<Icons name="search" size={16} color="white" />}
+            buttonStyle={{
+              ...style.anotherLogin,
+              backgroundColor: '#1e58b5',
+            }}
+          />
+
+          {dataSearch.length === 1 && (
             <View
               style={{
                 alignSelf: 'center',
@@ -47,38 +129,40 @@ function AddFriends(props) {
                 marginTop: 30,
               }}>
               <View style={{alignSelf: 'center'}}>
-                <Image
-                  source={user}
-                  style={{width: 100, height: 100, borderRadius: 100}}
-                />
-                <TouchableOpacity style={{marginTop: -45, marginLeft: 60}}>
-                  <Icon
-                    reverse
-                    name="ios-add"
-                    type="ionicon"
-                    color="grey"
-                    size={15}
+                <TouchableOpacity disabled={isAvailable ? true : false}>
+                  <Image
+                    source={
+                      (dataSearch[0].picture && {
+                        uri: dataSearch[0].picture,
+                      }) ||
+                      user
+                    }
+                    style={{width: 100, height: 100, borderRadius: 100}}
                   />
                 </TouchableOpacity>
+                {!isAvailable && (
+                  <TouchableOpacity
+                    style={{marginTop: -45, marginLeft: 60}}
+                    onPress={handleAdd}>
+                    <Icon
+                      reverse
+                      name="ios-add"
+                      type="ionicon"
+                      color="grey"
+                      size={15}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
 
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: 'white',
-                  marginTop: 10,
-                  fontWeight: 'bold',
-                  backgroundColor: '#888888',
-                  borderRadius: 10,
-                  paddingHorizontal: 15,
-                  padding: 2,
-                }}>
-                Michael Jordan
+              <Text style={style.name}>
+                {dataSearch[0].fullname ||
+                  (dataSearch[0].email && dataSearch[0].email.substring(0, 5))}
               </Text>
             </View>
           )}
 
-          {!isAvailable && (
+          {dataSearch.length === 0 && (
             <View
               style={{
                 alignSelf: 'center',
@@ -87,7 +171,9 @@ function AddFriends(props) {
                 alignItems: 'center',
                 marginTop: 50,
               }}>
-              <Text style={{fontSize: 20}}>Data is not found</Text>
+              <Text style={{fontSize: 17, color: 'grey'}}>
+                There is no data that search
+              </Text>
               <Image
                 source={Empty}
                 style={{
@@ -160,5 +246,26 @@ const style = StyleSheet.create({
     marginTop: -20,
     height: 50,
     width: 270,
+    paddingRight: 20,
+  },
+  name: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: 'white',
+    marginTop: 10,
+    fontWeight: 'bold',
+    backgroundColor: '#888888',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    padding: 2,
+  },
+  anotherLogin: {
+    borderRadius: 100,
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    right: 0,
+    marginTop: -58,
+    marginHorizontal: 8,
   },
 });

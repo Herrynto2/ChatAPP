@@ -8,9 +8,7 @@ const initialState = {
   isLogin: false,
   dataProfile: {},
   dataUser: {},
-  dataChat: [],
 };
-
 export default function userData(state = initialState, action) {
   switch (action.type) {
     case USER_LOGIN:

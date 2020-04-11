@@ -1,3 +1,4 @@
 import {combineReducers} from 'redux';
 import userData from '../Reducer/userDataReducers';
-export default combineReducers({userData});
+import userChat from '../Reducer/userChatReducer';
+export default combineReducers({userData, userChat});
