@@ -14,7 +14,6 @@ import Empty from '../../Helper/Image/notfound.jpg';
 import Loader from '../../Components/Loader';
 import {db} from '../../Config/Firebase';
 import {useSelector, useDispatch} from 'react-redux';
-import CustomAlert from '../../Components/CustomAlert';
 
 function AddFriends(props) {
   const [isAvailable, setIsAvailable] = React.useState(false);
@@ -22,8 +21,6 @@ function AddFriends(props) {
   const [dataSearch, setDataSearch] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const {dataUser} = useSelector(state => state.userData);
-
-  console.log(dataUser.uid);
 
   const handleSearch = async () => {
     if (textMessage.length > 0) {
@@ -77,6 +74,7 @@ function AddFriends(props) {
         fullname: dataSearch[0].fullname || '',
         email: dataSearch[0].email,
         picture: dataSearch[0].picture || '',
+        information: dataSearch[0].information || '',
       };
       const add = await db
         .ref('user-data')
@@ -122,14 +120,19 @@ function AddFriends(props) {
           />
 
           {dataSearch.length === 1 && (
-            <View
-              style={{
-                alignSelf: 'center',
-                marginBottom: 40,
-                marginTop: 30,
-              }}>
+            <View style={style.dataContainer}>
               <View style={{alignSelf: 'center'}}>
-                <TouchableOpacity disabled={isAvailable ? true : false}>
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate('FriendsProfile', {
+                      name: dataSearch[0].fullname,
+                      picture: dataSearch[0].picture,
+                      email: dataSearch[0].email,
+                      id: dataSearch[0].key,
+                      info: dataSearch[0].information,
+                    })
+                  }
+                  disabled={!isAvailable ? true : false}>
                   <Image
                     source={
                       (dataSearch[0].picture && {
@@ -163,16 +166,9 @@ function AddFriends(props) {
           )}
 
           {dataSearch.length === 0 && (
-            <View
-              style={{
-                alignSelf: 'center',
-                marginBottom: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 50,
-              }}>
+            <View style={style.emptyContainer}>
               <Text style={{fontSize: 17, color: 'grey'}}>
-                There is no data that search
+                There is no data
               </Text>
               <Image
                 source={Empty}
@@ -184,12 +180,6 @@ function AddFriends(props) {
               />
             </View>
           )}
-
-          {/* <View style={{alignSelf: 'center'}}>
-            <View style={{alignItems: 'center'}}>
-              <Button title="Edit" buttonStyle={style.button} />
-            </View>
-          </View> */}
         </View>
       </View>
     </>
@@ -267,5 +257,17 @@ const style = StyleSheet.create({
     right: 0,
     marginTop: -58,
     marginHorizontal: 8,
+  },
+  emptyContainer: {
+    alignSelf: 'center',
+    marginBottom: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  dataContainer: {
+    alignSelf: 'center',
+    marginBottom: 40,
+    marginTop: 30,
   },
 });

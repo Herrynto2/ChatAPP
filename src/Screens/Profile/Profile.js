@@ -89,7 +89,6 @@ function Profile(props) {
             contentType: values.picture.type,
           });
         if (image) {
-          console.log('apaaj');
           const urlPicture = await storage
             .ref(image.metadata.fullPath)
             .getDownloadURL();

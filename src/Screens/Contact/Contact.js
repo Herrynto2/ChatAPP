@@ -1,41 +1,51 @@
 import React from 'react';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import {ListItem, SearchBar} from 'react-native-elements';
-import Data from './Component/Data';
 import {db} from '../../Config/Firebase';
 import {useSelector, useDispatch} from 'react-redux';
 import user from '../../Helper/Image/users.png';
+import Empty from '../../Helper/Image/nocontact.jpg';
 
 function Contact(props) {
   const {dataUser} = useSelector(state => state.userData);
   const [contact, setContact] = React.useState([]);
+  const [isAvailable, setIsAvailable] = React.useState(false);
 
   const dataContact = Object.keys(contact).map(key => ({
     ...contact[key],
     key: key,
   }));
-  console.log('contact', dataContact);
-
   React.useEffect(() => {
     let get = db.ref(`user-data/${dataUser.uid}/friends`);
     get.on('value', res => {
-      console.log('contact', res);
-      let data = res.val();
-      const keys = Object.keys(data);
-      const values = Object.values(data);
-      console.log(data);
-      for (let i = 0; i < keys.length; i++) {
-        if (keys[i] !== dataUser.uid) {
-          setContact(prevState => ({
-            ...prevState,
-            [keys[i]]: values[i],
-          }));
+      if (res) {
+        let data = res.val();
+        if (data === null) {
+          setIsAvailable(false);
         } else {
+          setIsAvailable(true);
+          const keys = Object.keys(data);
+          const values = Object.values(data);
+          for (let i = 0; i < keys.length; i++) {
+            if (keys[i] !== dataUser.uid) {
+              setContact(prevState => ({
+                ...prevState,
+                [keys[i]]: values[i],
+              }));
+            }
+          }
         }
+      } else {
       }
     });
   }, []);
-
   return (
     <>
       <View
@@ -49,8 +59,6 @@ function Contact(props) {
         <View style={{flex: 1, paddingHorizontal: 30, marginBottom: 50}}>
           <SearchBar
             placeholder="Type Here..."
-            // onChangeText={this.updateSearch}
-            // value={search}
             containerStyle={style.seacrhContainer}
             inputContainerStyle={style.seacrhInput}
             inputStyle={{fontSize: 14}}
@@ -67,39 +75,49 @@ function Contact(props) {
           </Text>
         </View>
         <View style={{marginTop: 20, flex: 10}}>
-          <FlatList
-            style={{paddingHorizontal: 20}}
-            keyExtractor={(item, index) => index}
-            data={dataContact}
-            renderItem={({item, index}) => (
-              <TouchableOpacity
-                onPress={() =>
-                  props.navigation.navigate('ChatID', {
-                    name: item.fullname,
-                    picture: item.picture,
-                    email: item.email,
-                    id: item.key,
-                  })
-                }>
-                <ListItem
-                  containerStyle={{backgroundColor: '#ebeaee'}}
-                  title={item.fullname || item.email.substring(0, 6)}
-                  titleStyle={style.nameUser}
-                  subtitle={
-                    <View>
-                      <Text style={style.status}>
-                        {item.information && item.information.substring(0, 20)}
-                      </Text>
-                    </View>
-                  }
-                  bottomDivider
-                  leftAvatar={{
-                    source: item.picture === '' ? user : {uri: item.picture},
-                  }}
-                />
-              </TouchableOpacity>
-            )}
-          />
+          {isAvailable && (
+            <FlatList
+              style={{paddingHorizontal: 20}}
+              keyExtractor={(item, index) => index}
+              data={dataContact}
+              renderItem={({item, index}) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate('FriendsProfile', {
+                      name: item.fullname,
+                      picture: item.picture,
+                      email: item.email,
+                      id: item.id,
+                      info: item.information,
+                    })
+                  }>
+                  <ListItem
+                    containerStyle={{backgroundColor: '#ebeaee'}}
+                    title={item.fullname || item.email.substring(0, 6)}
+                    titleStyle={style.nameUser}
+                    subtitle={
+                      <View>
+                        <Text style={style.status}>
+                          {item.information &&
+                            item.information.substring(0, 20)}
+                        </Text>
+                      </View>
+                    }
+                    bottomDivider
+                    leftAvatar={{
+                      source: item.picture === '' ? user : {uri: item.picture},
+                    }}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+          )}
+
+          {!isAvailable && (
+            <View style={style.emptyContainer}>
+              <Image source={Empty} style={style.emptyImg} />
+            </View>
+          )}
         </View>
       </View>
     </>
@@ -133,5 +151,17 @@ const style = StyleSheet.create({
     borderRadius: 20,
     marginTop: 25,
     height: 50,
+  },
+  emptyContainer: {
+    alignSelf: 'center',
+    marginBottom: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyImg: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
 });

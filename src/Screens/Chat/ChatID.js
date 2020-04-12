@@ -18,10 +18,12 @@ import {useSelector, useDispatch} from 'react-redux';
 import {db} from '../../Config/Firebase';
 import {DatePickerAndroid} from 'react-native';
 import {chatList} from '../../Redux/Actions/userDataAction';
+import OverlayPicture from '../../Components/OverlayPicture';
 
 YellowBox.ignoreWarnings(['Warning: Each child in a list should']);
 
 function ChatID(props) {
+  const [isVisible, setHideVisible] = React.useState(false);
   const [textMessage, setMessage] = React.useState('');
   const [messageList, setMessageList] = React.useState([]);
   const {dataUser} = useSelector(state => state.userData);
@@ -95,7 +97,6 @@ function ChatID(props) {
               let data = value.val();
               const keys = Object.keys(data);
               const values = Object.values(data);
-              // console.log(values);
               for (let i = 0; i < keys.length; i++) {
                 setMessageList(prevState => ({
                   ...prevState,
@@ -117,13 +118,22 @@ function ChatID(props) {
   return (
     <>
       <View style={style.containerHeader}>
+        {isVisible && (
+          <OverlayPicture
+            picture={props.route.params.picture}
+            isVisible={isVisible}
+            setHideVisible={setHideVisible}
+          />
+        )}
         <TouchableOpacity
           style={{width: 50, marginTop: 35}}
           onPress={() => props.navigation.goBack()}>
           <Icons name="chevron-left" size={20} style={style.backIcon} />
         </TouchableOpacity>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity style={{height: 50, marginTop: -38}}>
+          <TouchableOpacity
+            style={{height: 50, marginTop: -38}}
+            onPress={() => setHideVisible(true)}>
             <Image
               source={
                 (props.route.params.picture && {
@@ -131,12 +141,7 @@ function ChatID(props) {
                 }) ||
                 User
               }
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 17,
-                marginHorizontal: 7,
-              }}
+              style={style.ImageUser}
               PlaceholderContent={<ActivityIndicator />}
             />
           </TouchableOpacity>
@@ -158,14 +163,9 @@ function ChatID(props) {
                   }}>
                   <TouchableOpacity
                     key={i}
-                    style={{height: 50, marginTop: 0, marginRight: 10}}>
-                    {/* <Image source={User} style={style.friendsImage} /> */}
-                  </TouchableOpacity>
+                    style={{height: 50, marginTop: 0, marginRight: 10}}
+                  />
                   <View style={{marginTop: -20}}>
-                    {/* <Text style={style.friendsDate}>{v.fullname}</Text> */}
-                    {/* 
-                  {v.chat.map((v, i) => (
-                    <> */}
                     <Text
                       style={
                         dataUser.uid === v.id
@@ -328,5 +328,11 @@ const style = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: 'row',
     paddingRight: 60,
+  },
+  ImageUser: {
+    width: 50,
+    height: 50,
+    borderRadius: 17,
+    marginHorizontal: 7,
   },
 });

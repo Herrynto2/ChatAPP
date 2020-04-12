@@ -1,10 +1,22 @@
 import React from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from 'react-native';
 import {Avatar, ListItem, Button} from 'react-native-elements';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import ChatTop from './ChatTop';
 import ListChat from './Components/ListChat';
+import {db} from '../../Config/Firebase';
+import {useSelector, useDispatch} from 'react-redux';
+import user from '../../Helper/Image/users.png';
 import {YellowBox} from 'react-native';
+import Empty from '../../Helper/Image/nochat.jpg';
+
 YellowBox.ignoreWarnings([
   'Setting a timer for a long period of time',
   'Warning: Failed child context type: Invalid child context',
@@ -12,43 +24,82 @@ YellowBox.ignoreWarnings([
 ]);
 
 function ChatList(props) {
+  const [isAvailable, setIsAvailable] = React.useState(false);
+  const [listChat, setListChat] = React.useState([]);
+  const {dataUser} = useSelector(state => state.userData);
+  const dataChat = Object.keys(listChat).map(key => ({
+    ...listChat[key],
+    key: key,
+  }));
+  console.log('ss', isAvailable);
+
+  React.useEffect(() => {
+    let get = db.ref(`list-chat/${dataUser.uid}/friends`);
+    get.on('value', res => {
+      console.log('res', res);
+      if (res) {
+        let data = res.val();
+        if (data === null) {
+          setIsAvailable(false);
+        } else {
+          setIsAvailable(true);
+          const keys = Object.keys(data);
+          const values = Object.values(data);
+          for (let i = 0; i < keys.length; i++) {
+            setListChat(prevState => ({
+              ...prevState,
+              [keys[i]]: values[i],
+            }));
+          }
+        }
+      }
+    });
+  }, []);
+
   return (
     <>
-      {console.log(ListChat)}
       <ChatTop />
       <View style={style.container}>
-        <FlatList
-          style={{marginTop: 20, paddingHorizontal: 15}}
-          keyExtractor={(item, index) => index}
-          data={ListChat}
-          renderItem={({item, index}) => (
-            <TouchableOpacity
-              onPress={() =>
-                props.navigation.navigate('ChatID', {
-                  name: item.name,
-                  image: item.image,
-                  date: item.date,
-                })
-              }>
-              <ListItem
-                title={item.name}
-                titleStyle={style.nameUser}
-                subtitle={
-                  <View>
-                    <Text style={style.message}>
-                      {item.msg.substring(0, 80)} .....
-                    </Text>
-                    <Text style={style.date}>{item.date}</Text>
-                  </View>
-                }
-                bottomDivider
-                leftAvatar={{
-                  source: item.image,
-                }}
-              />
-            </TouchableOpacity>
-          )}
-        />
+        {isAvailable && (
+          <FlatList
+            style={{marginTop: 20, paddingHorizontal: 15}}
+            keyExtractor={(item, index) => index}
+            data={dataChat}
+            renderItem={({item, index}) => (
+              <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate('ChatID', {
+                    id: item.id,
+                    email: item.email,
+                    name: item.fullname || item.email,
+                    picture: item.picture,
+                  })
+                }>
+                <ListItem
+                  title={item.fullname}
+                  titleStyle={style.nameUser}
+                  subtitle={
+                    <View>
+                      <Text style={style.message}>
+                        {item.msg && item.msg.substring(0, 80)} .....
+                      </Text>
+                      <Text style={style.date}>{item.date}</Text>
+                    </View>
+                  }
+                  bottomDivider
+                  leftAvatar={{
+                    source: item.picture === '' ? user : {uri: item.picture},
+                  }}
+                />
+              </TouchableOpacity>
+            )}
+          />
+        )}
+        {!isAvailable && (
+          <View style={style.emptyContainer}>
+            <Image source={Empty} style={style.emptyImg} />
+          </View>
+        )}
         <View style={style.containerSearch}>
           <Button
             buttonStyle={style.button}
@@ -102,5 +153,17 @@ const style = StyleSheet.create({
     width: 100,
     backgroundColor: '#1e57b5',
     borderRadius: 20,
+  },
+  emptyContainer: {
+    alignSelf: 'center',
+    marginBottom: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyImg: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
 });
