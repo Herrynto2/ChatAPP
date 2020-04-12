@@ -17,6 +17,7 @@ import {useFormik} from 'formik';
 import {auth} from '../../Config/Firebase';
 import {userLogin, updateProfile} from '../../Redux/Actions/userDataAction';
 import {useDispatch} from 'react-redux';
+import {db} from '../../Config/Firebase';
 
 function Login(props) {
   const [hidePassword, setHidePassword] = React.useState(true);
@@ -41,6 +42,24 @@ function Login(props) {
             CustomAlert(true, 'Login success');
             form.setSubmitting(false);
             form.resetForm();
+            db.ref(`user-data/`)
+              // .orderBy('friends')
+              .orderByChild('friends')
+              .startAt(response.user.uid)
+              .on('value', res => {
+                if (res) {
+                  console.log('res', res);
+                  let data = res.val();
+
+                  const keys = Object.keys(data);
+                  // const update = db
+                  //   .ref(`list-chat/${dataUser.uid}/friends/${keys[0]}`)
+                  //   .update({
+                  //     newmessage: textMessage,
+                  //   });
+                } else {
+                }
+              });
           })
           .catch(err => {
             CustomAlert(false, err.message);

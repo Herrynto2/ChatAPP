@@ -7,12 +7,11 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import {Avatar, ListItem, Button} from 'react-native-elements';
+import {ListItem, Button} from 'react-native-elements';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import ChatTop from './ChatTop';
-import ListChat from './Components/ListChat';
 import {db} from '../../Config/Firebase';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
 import user from '../../Helper/Image/users.png';
 import {YellowBox} from 'react-native';
 import Empty from '../../Helper/Image/nochat.jpg';
@@ -31,12 +30,10 @@ function ChatList(props) {
     ...listChat[key],
     key: key,
   }));
-  console.log('ss', isAvailable);
 
   React.useEffect(() => {
     let get = db.ref(`list-chat/${dataUser.uid}/friends`);
     get.on('value', res => {
-      console.log('res', res);
       if (res) {
         let data = res.val();
         if (data === null) {
@@ -81,7 +78,9 @@ function ChatList(props) {
                   subtitle={
                     <View>
                       <Text style={style.message}>
-                        {item.msg && item.msg.substring(0, 80)} .....
+                        {item.newmessage
+                          ? item.newmessage.substring(0, 80)
+                          : '.....'}
                       </Text>
                       <Text style={style.date}>{item.date}</Text>
                     </View>

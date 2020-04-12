@@ -25,6 +25,7 @@ function FriendsProfile(props) {
         fullname: props.route.params.name || '',
         email: props.route.params.email,
         picture: props.route.params.picture || '',
+        newmessage: '',
       };
       await db
         .ref(`list-chat/${dataUser.uid}/friends/`)
@@ -92,15 +93,64 @@ function FriendsProfile(props) {
                 }}
               />
             </TouchableOpacity>
-            <View style={{alignItems: 'center', marginTop: 30}}>
-              <Text style={{}}>{props.route.params.name}</Text>
-              <Text>{props.route.params.email}</Text>
-              <Text>{props.route.params.info}</Text>
+            <View
+              style={{
+                alignItems: 'center',
+                marginTop: 30,
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  backgroundColor: '#1e58b5',
+                  fontSize: 20,
+                  padding: 5,
+                  paddingHorizontal: 20,
+                  borderRadius: 15,
+                  marginBottom: 10,
+                }}>
+                {props.route.params.name
+                  ? props.route.params.name
+                  : props.route.params.email.substring(0, 6)}
+              </Text>
+              <View style={{flexDirection: 'row'}}>
+                <Icons
+                  name="envelope"
+                  size={16}
+                  color="#b8b8b8"
+                  style={{marginTop: 7, marginRight: 10}}
+                />
+                <Text
+                  style={{
+                    color: '#929292',
+                    fontSize: 15,
+                    marginTop: 5,
+                    marginBottom: 5,
+                  }}>
+                  {props.route.params.email}
+                </Text>
+              </View>
+
+              <Text style={{color: '#929292'}}>{props.route.params.info}</Text>
             </View>
             <TouchableOpacity
-              style={{width: 50, marginTop: 35}}
+              style={{
+                width: 50,
+                marginTop: -170,
+                marginLeft: 160,
+                marginBottom: 10,
+              }}
               onPress={handleAddToChat}>
-              <Icons name="comment" size={30} />
+              <Icons
+                name="comment"
+                size={20}
+                color="white"
+                style={{
+                  backgroundColor: '#1e58b5',
+                  padding: 10,
+                  alignSelf: 'center',
+                  borderRadius: 20,
+                }}
+              />
             </TouchableOpacity>
           </View>
         </View>

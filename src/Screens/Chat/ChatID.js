@@ -24,6 +24,8 @@ YellowBox.ignoreWarnings(['Warning: Each child in a list should']);
 
 function ChatID(props) {
   const [isVisible, setHideVisible] = React.useState(false);
+  const [keys, setKeys] = React.useState('');
+  const [isAvailbale, setIsAvailable] = React.useState(false);
   const [textMessage, setMessage] = React.useState('');
   const [messageList, setMessageList] = React.useState([]);
   const {dataUser} = useSelector(state => state.userData);
@@ -33,22 +35,18 @@ function ChatID(props) {
     key: key,
   }));
   const dispatch = useDispatch();
-  console.log('messsage', messageListArr);
 
   React.useEffect(() => {
     const gets = db
       .ref('chat-room')
       .child(dataUser.uid)
-      .on('value', res => {
-        console.log('res', res);
-      });
+      .on('value', res => {});
 
     const get = db
       .ref('chat-room')
       .child(dataUser.uid)
       .child(props.route.params.id)
       .on('value', value => {
-        console.log('val', value);
         if (value) {
           let data = value.val();
           if (data === null) {
@@ -75,20 +73,69 @@ function ChatID(props) {
         let msg = {
           to: props.route.params.name,
           msg: textMessage,
-          time: new Date().getHours() + '.' + new Date().getHours(),
+          time: new Date().getHours() + '.' + new Date().getMinutes(),
           id: dataUser.uid,
         };
-        let msgID = await db
+        const msgID = await db
           .ref('chat-room')
           .child(dataUser.uid)
           .child(props.route.params.id)
           .push(msg);
-        let msgIDReceiv = await db
+        setMessage('');
+        const msgIDReceiv = await db
           .ref('chat-room')
           .child(props.route.params.id)
           .child(dataUser.uid)
           .push(msg);
+        //  if(msgReceiv) {
+
+        //  }
+        // const msgUpdateFriends = await db
+        //   .ref(`list-chat/${props.route.params.id}/friends/`)
+        //   .orderByChild('id')
+        //   .startAt(dataUser.uid)
+        //   .on('value', response => {
+        //     console.log('response', response);
+        //     if (response) {
+        //       let datas = response.val();
+        //       if (datas === null) {
+        //         console.log('null');
+        //         return;
+        //       } else {
+        //         const key = Object.keys(datas);
+        //         console.log('key', key[0]);
+        //         db.ref(
+        //           `list-chat/${props.route.params.id}/friends/${key}`,
+        //         ).update({
+        //           newmessage: textMessage,
+        //         });
+        //         return;
+        //       }
+        //     }
+        //   });
+
         if (msgID) {
+          const msgUpdateUser = await db
+            .ref(`list-chat/${dataUser.uid}/friends/`)
+            .orderByChild('id')
+            .startAt(props.route.params.id)
+            .on('value', res => {
+              if (res) {
+                console.log('res', res);
+                let data = res.val();
+                setIsAvailable(true);
+                const keys = Object.keys(data);
+                const update = db
+                  .ref(`list-chat/${dataUser.uid}/friends/${keys[0]}`)
+                  .update({
+                    newmessage: textMessage,
+                  });
+                setKeys(keys[0]);
+              } else {
+                setIsAvailable(false);
+              }
+            });
+
           const get = db
             .ref('chat-room')
             .child(dataUser.uid)
@@ -107,7 +154,7 @@ function ChatID(props) {
                 ...messageList[key],
                 key: key,
               }));
-              dispatch(chatList(messageListArr));
+              // dispatch(chatList(messageListArr));
               setMessage('');
             });
         }

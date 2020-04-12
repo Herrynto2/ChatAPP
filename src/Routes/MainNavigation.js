@@ -5,6 +5,7 @@ import PrivateNavigation from './PrivateNavigation';
 import PublicNavigation from './PublicNavgation';
 import SplashScreen from 'react-native-splash-screen';
 import {useSelector, useDispatch} from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
 
 function MainRoutes(props) {
   const {isLogin} = useSelector(state => state.userData);
